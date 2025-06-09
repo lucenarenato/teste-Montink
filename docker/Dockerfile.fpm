@@ -1,0 +1,92 @@
+# Use a imagem base do PHP 8.2 FPM Alpine
+FROM php:8.2-fpm-alpine
+
+# Variáveis de ambiente
+ENV GROUP_ID=1000 \
+    USER_ID=1000 \
+    USER_NAME=www \
+    GROUP_NAME=www \
+    WORKDIR=/var/www/html \
+    DOCUMENT_ROOT=${WORKDIR} \
+    LARAVEL_PROCS_NUMBER=1 \
+    TZ=America/Sao_Paulo
+
+# Configurar o fuso horário
+RUN apk add --no-cache tzdata && \
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+    echo $TZ > /etc/timezone
+
+# Instalar dependências necessárias e ferramentas
+RUN apk --update add --no-cache \
+    wget \
+    curl \
+    git \
+    grep \
+    gcc \
+    build-base \
+    libmemcached-dev \
+    libxml2-dev \
+    imagemagick-dev \
+    pcre-dev \
+    libtool \
+    make \
+    autoconf \
+    automake \
+    g++ \
+    nasm \
+    cyrus-sasl-dev \
+    libgsasl-dev \
+    supervisor \
+    libpq-dev \
+    libpng-dev \
+    zlib-dev \
+    zip \
+    vips-dev \
+    $PHPIZE_DEPS
+
+# Instalar o Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
+
+# Instalar extensões PHP comuns
+RUN docker-php-ext-install mysqli pdo pdo_mysql xml
+
+# Instalar a extensão PCNTL
+RUN docker-php-ext-configure pcntl --enable-pcntl && \
+    docker-php-ext-install pcntl && \
+    #docker-php-ext-install zip && \
+    # docker-php-ext-configure zip --with-libzip && \
+    docker-php-ext-install exif
+
+RUN apk add --no-cache libzip-dev && docker-php-ext-configure zip && docker-php-ext-install zip
+
+# Instalar a extensão Sockets
+RUN docker-php-ext-install sockets
+
+# Instalar a extensão GD
+RUN apk add --no-cache freetype-dev libjpeg-turbo-dev libpng-dev && \
+    docker-php-ext-configure gd --with-freetype --with-jpeg && \
+    docker-php-ext-install gd intl
+
+# Instalar extensões PECL
+RUN pecl channel-update pecl.php.net && \
+    pecl install memcached imagick && \
+    docker-php-ext-enable memcached imagick
+
+# Criar grupo e usuário
+RUN addgroup -g $GROUP_ID $GROUP_NAME && \
+    adduser -D -u $USER_ID -G $GROUP_NAME $USER_NAME -s /bin/sh
+
+# Configurar diretórios de trabalho
+WORKDIR $WORKDIR
+RUN mkdir -p storage bootstrap/cache && \
+    chown -R $USER_NAME:$GROUP_NAME storage bootstrap/cache && \
+    chmod -R 775 storage bootstrap/cache
+
+# Adicionar o cron job ao crontab (opcional, se você realmente precisa)
+RUN echo "0 * * * * chmod -R 775 /var/www/html/storage" >> /etc/crontabs/root
+
+# Limpar cache do APK
+RUN rm -rf /var/cache/apk/*
+
+# Entrypoint para iniciar o PHP e o cron
+CMD ["php-fpm"]

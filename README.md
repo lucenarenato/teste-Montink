@@ -8,4 +8,5 @@
 - Session (para carrinho)
 - ViaCEP API (frete)
 
+cp .env.example .env
 `pnpm install && pnpm run dev `
