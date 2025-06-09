@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('coupons', function (Blueprint $table) {
             $table->id();
+            $table->string('code')->unique();
+            $table->decimal('discount', 10, 2); // valor fixo de desconto
             $table->timestamps();
         });
     }
