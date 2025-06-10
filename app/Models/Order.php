@@ -11,8 +11,8 @@ class Order extends Model
 
     protected $fillable = ['subtotal', 'freight', 'total', 'cep'];
 
-    // Se futuramente quiser associar produtos ao pedido:
-    // public function items() {
-    //     return $this->hasMany(OrderItem::class);
-    // }
+    public function items()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
 }
