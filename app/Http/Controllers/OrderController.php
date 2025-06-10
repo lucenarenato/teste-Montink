@@ -48,8 +48,8 @@ class OrderController extends Controller
             'cep' => $request->cep,
             'coupon_code' => $coupon?->code,
             'discount' => $discount,
-            'status' => 'AGUARDANDO_PAGAMENTO',
-            'email' => $request->email,
+            'status' => 'AGUARDANDO_PAGAMENTO'
+            //'email' => $request->email,
         ]);
 
         foreach ($cart as $item) {
