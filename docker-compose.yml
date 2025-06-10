@@ -50,7 +50,7 @@ services:
             - default
 
     mysql:
-        container_name: "LaraVue_MYSQL"
+        container_name: "${APP_NAME}_MYSQL"
         image: mysql:8.0  # Suporta ARM64
         tty: true
         command: --default-authentication-plugin=mysql_native_password --max_connections=666 --bind-address=0.0.0.0 --transaction-isolation=READ-COMMITTED
