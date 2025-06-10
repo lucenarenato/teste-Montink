@@ -34,8 +34,7 @@ class ProductController extends Controller
 
         }
 
-        //return redirect()->back()->with('success', 'Produto criado com sucesso!');
-        return redirect()->route('products.index')->with('success', 'Produto criado');
+        return redirect()->route('home')->with('success', 'Produto criado com sucesso!');
     }
 
     public function update(Request $request, Product $product)

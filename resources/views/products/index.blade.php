@@ -2,26 +2,8 @@
 
 @section('content')
 <div class="container">
-    <h2>Cadastro de Produtos</h2>
-    <form method="POST" action="{{ route('products.store') }}">
-        @csrf
-        <input type="text" name="name" placeholder="Nome" class="form-control" required>
-        <input type="number" name="price" step="0.01" placeholder="Preço" class="form-control" required>
-
-        <div id="variations">
-            <div class="d-flex mb-2">
-                <input type="text" name="variations[]" placeholder="Variação" class="form-control me-2">
-                <input type="number" name="quantities[]" placeholder="Estoque" class="form-control">
-            </div>
-        </div>
-
-        <button type="button" class="btn btn-secondary mb-3" onclick="addVariation()">+ Variação</button>
-        <button type="submit" class="btn btn-primary">Salvar</button>
-    </form>
-
-    <hr>
-
-    <h3>Produtos</h3>
+    {{-- <a class="btn btn-labeled btn-success" href="products/add" title="Create">Create</a> --}}
+    <h3>Lista de Produtos</h3>
     @foreach ($products as $product)
         <div class="card p-3 my-2">
             <strong>{{ $product->name }}</strong> - R${{ $product->price }}
@@ -42,11 +24,16 @@
     @endforeach
 
     <hr>
-    <form method="POST" action="{{ route('checkout') }}">
-        @csrf
-        <input type="text" name="cep" id="cep" placeholder="Digite o CEP" class="form-control mb-2">
-        <button type="submit" class="btn btn-warning">Finalizar Pedido</button>
-    </form>
+    @if(!is_null($products))
+        <form method="POST" action="{{ route('checkout') }}">
+            @csrf
+            <input type="text" name="cep" id="cep" placeholder="Digite o CEP" class="form-control mb-2">
+            <button type="submit" class="btn btn-warning">Finalizar Pedido</button>
+        </form>
+    @else
+
+    @endif
+
 </div>
 
 <script>
