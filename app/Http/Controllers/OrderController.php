@@ -41,13 +41,14 @@ class OrderController extends Controller
         $total = $subtotal + $freight - $discount;
 
         $order = Order::create([
+            'session_id' => session()->getId(),
             'subtotal' => $subtotal,
             'freight' => $freight,
             'total' => $total,
             'cep' => $request->cep,
             'coupon_code' => $coupon?->code,
             'discount' => $discount,
-            'status' => 'pendente',
+            'status' => 'AGUARDANDO_PAGAMENTO',
             'email' => $request->email,
         ]);
 
