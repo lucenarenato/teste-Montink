@@ -8,5 +8,11 @@
 - Session (para carrinho)
 - ViaCEP API (frete)
 
+```sh
 cp .env.example .env
-`pnpm install && pnpm run dev `
+chmod -R 777 storage
+php artisan cache:clear && php artisan config:clear && php artisan route:clear && php artisan view:clear && php artisan optimize:clear
+    chmod -R gu+w storage && chmod -R guo+w storage && chmod -R 777 storage/ && chmod -R 777 storage/* bootstrap/cache/*
+    composer dump-autoload
+pnpm install && pnpm run dev 
+```
