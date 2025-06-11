@@ -1,0 +1,731 @@
+<div class="" style="width: 580px;">
+<p>Frente fria - vista do espaço</p>
+<p>Imagens de uma frente fria vista do espaço.</p>
+<p>A imagem representa uma formação de nuvens bastante característica, conhecida como frente fria ou linha de instabilidade, geralmente associada a sistemas meteorológicos frontais. A imagem mostra claramente uma longa faixa de nuvens se estendendo de norte a sul sobre a América do Sul, mais precisamente sobre a Argentina, com o Brasil à direita da imagem.</p>
+<p>A formação é típica de frentes frias, onde o ar frio (à esquerda) empurra o ar quente (à direita), forçando o ar quente a subir. Esse movimento gera condensação e, consequentemente, essa faixa contínua de nuvens densas.</p>
+<p>A formação de nuvens é linear e se alinha com a borda dos Andes, o que é comum devido à topografia que canaliza os ventos e intensifica o contraste térmico entre as massas de ar.
+Essa imagem é um exemplo impressionante da interação entre clima e geografia terrestre.</p>
+
+<p>- Existe alguma api que posso consumir para ver previsao do tempo e como posso fazer sito com laravel?</p>
+
+<p>Sim, existem diversas APIs confi&aacute;veis que fornecem <strong data-end="79" data-start="51">previs&otilde;es meteorol&oacute;gicas</strong>, e voc&ecirc; pode facilmente consumi-las em um projeto Laravel com HTTP Client (<code data-end="168" data-start="155">Http::get()</code> ou Guzzle). Aqui est&atilde;o algumas op&ccedil;&otilde;es populares:</p>
+
+<hr />
+<h3>🌤️ APIs para Previs&atilde;o do Tempo</h3>
+
+<ol>
+	<li>
+	<p><strong>OpenWeatherMap</strong></p>
+
+	<ul>
+		<li>
+		<p>Site: <a href="https://openweathermap.org/api">https://openweathermap.org/api</a></p>
+		</li>
+		<li>
+		<p>Tem plano gratuito com limites razo&aacute;veis.</p>
+		</li>
+		<li>
+		<p>Fornece previs&atilde;o atual, por hora e por 7 dias, al&eacute;m de mapas clim&aacute;ticos.</p>
+		</li>
+		<li>
+		<p>Necess&aacute;rio registrar e obter uma <code inline="">API Key</code>.</p>
+		</li>
+	</ul>
+	</li>
+	<li>
+	<p><strong>WeatherAPI</strong></p>
+
+	<ul>
+		<li>
+		<p>Site: <a href="https://www.weatherapi.com/">https://www.weatherapi.com</a></p>
+		</li>
+		<li>
+		<p>Fornece previs&atilde;o atual, hist&oacute;rica, futura, e dados astron&ocirc;micos.</p>
+		</li>
+	</ul>
+	</li>
+	<li>
+	<p><strong>Climacell (Tomorrow.io)</strong></p>
+
+	<ul>
+		<li>
+		<p>Site: <a href="https://www.tomorrow.io/">https://www.tomorrow.io</a></p>
+		</li>
+		<li>
+		<p>Oferece insights hiperlocais (&uacute;til para previs&atilde;o em regi&otilde;es espec&iacute;ficas, como a borda dos Andes).</p>
+		</li>
+	</ul>
+	</li>
+</ol>
+
+<hr />
+<h3>🚀 Exemplo de Integra&ccedil;&atilde;o no Laravel com OpenWeatherMap</h3>
+
+<h4>1. Instale o HTTP Client (Laravel 7+ j&aacute; vem com <code inline="">Http</code>):</h4>
+
+<pre>
+<code>composer require guzzlehttp/guzzle
+</code></pre>
+
+<h4>2. No <code inline="">.env</code>, adicione:</h4>
+
+<pre>
+<code>OPENWEATHER_API_KEY=your_api_key_aqui
+</code></pre>
+
+<h4>3. Crie um Controller:</h4>
+
+<pre>
+<code>php artisan make:controller WeatherController
+</code></pre>
+
+<h4>4. C&oacute;digo no controller:</h4>
+
+<pre>
+<code>use Illuminate\Support\Facades\Http;
+
+class WeatherController extends Controller
+{
+    public function getWeather($city = &#39;Buenos Aires&#39;)
+    {
+        $apiKey = env(&#39;OPENWEATHER_API_KEY&#39;);
+        $response = Http::get(&quot;https://api.openweathermap.org/data/2.5/weather&quot;, [
+            &#39;q&#39; =&gt; $city,
+            &#39;appid&#39; =&gt; $apiKey,
+            &#39;units&#39; =&gt; &#39;metric&#39;,
+            &#39;lang&#39; =&gt; &#39;pt_br&#39;,
+        ]);
+
+        if ($response-&gt;successful()) {
+            return response()-&gt;json($response-&gt;json());
+        }
+
+        return response()-&gt;json([&#39;error&#39; =&gt; &#39;Erro ao obter dados meteorol&oacute;gicos&#39;], 500);
+    }
+}
+</code></pre>
+
+<h4>5. Rota em <code inline="">web.php</code> ou <code inline="">api.php</code>:</h4>
+
+<pre>
+<code>Route::get(&#39;/weather/{city?}&#39;, [WeatherController::class, &#39;getWeather&#39;]);
+</code></pre>
+
+<hr />
+<h3>📌 Resultado</h3>
+
+<p>Acesse:</p>
+
+<pre>
+<code>http://localhost:8000/weather/S&atilde;o%20Paulo
+</code></pre>
+
+<p>E receba uma resposta como:</p>
+
+<pre>
+<code>{
+  &quot;main&quot;: {
+    &quot;temp&quot;: 21.6,
+    &quot;humidity&quot;: 78
+  },
+  &quot;weather&quot;: [
+    {
+      &quot;description&quot;: &quot;nuvens dispersas&quot;
+    }
+  ]
+}
+</code></pre>
+
+<hr />
+<p>&Oacute;timo! Vamos mostrar a previs&atilde;o do tempo em uma <strong>view Blade</strong>, com Laravel (pode ser usado com Livewire depois, se quiser reatividade).</p>
+
+<hr />
+<h2>✅ Etapas para exibir previs&atilde;o do tempo em uma view Blade</h2>
+
+<h3>1. 🔧 Controller: ajustar para enviar os dados para a view</h3>
+
+<p>Atualize seu <code inline="">WeatherController</code> para:</p>
+
+<pre>
+<code>use Illuminate\Support\Facades\Http;
+
+class WeatherController extends Controller
+{
+    public function show($city = &#39;Buenos Aires&#39;)
+    {
+        $apiKey = env(&#39;OPENWEATHER_API_KEY&#39;);
+        $response = Http::get(&quot;https://api.openweathermap.org/data/2.5/weather&quot;, [
+            &#39;q&#39; =&gt; $city,
+            &#39;appid&#39; =&gt; $apiKey,
+            &#39;units&#39; =&gt; &#39;metric&#39;,
+            &#39;lang&#39; =&gt; &#39;pt_br&#39;,
+        ]);
+
+        if ($response-&gt;successful()) {
+            $weather = $response-&gt;json();
+            return view(&#39;weather.show&#39;, compact(&#39;weather&#39;, &#39;city&#39;));
+        }
+
+        return view(&#39;weather.show&#39;, [&#39;weather&#39; =&gt; null, &#39;city&#39; =&gt; $city]);
+    }
+}
+</code></pre>
+
+<hr />
+<h3>2. 🛣️ Rota (em <code inline="">web.php</code>)</h3>
+
+<pre>
+<code>Route::get(&#39;/previsao/{city?}&#39;, [WeatherController::class, &#39;show&#39;]);
+</code></pre>
+
+<hr />
+<h3>3. 🖼️ Criar a view Blade: <code inline="">resources/views/weather/show.blade.php</code></h3>
+
+<pre>
+<code>@extends(&#39;layouts.app&#39;)
+
+@section(&#39;content&#39;)
+&lt;div class=&quot;max-w-md mx-auto mt-10 bg-white shadow-xl rounded-xl p-6 text-center&quot;&gt;
+    &lt;h1 class=&quot;text-2xl font-bold mb-4&quot;&gt;Previs&atilde;o do Tempo&lt;/h1&gt;
+
+    &lt;form method=&quot;GET&quot; action=&quot;{{ url(&#39;/previsao&#39;) }}&quot; class=&quot;mb-4&quot;&gt;
+        &lt;input type=&quot;text&quot; name=&quot;city&quot; placeholder=&quot;Digite a cidade&quot;
+               value=&quot;{{ old(&#39;city&#39;, $city) }}&quot;
+               class=&quot;border px-3 py-2 rounded w-full mb-2&quot; /&gt;
+        &lt;button type=&quot;submit&quot; class=&quot;bg-blue-500 text-white px-4 py-2 rounded&quot;&gt;
+            Buscar
+        &lt;/button&gt;
+    &lt;/form&gt;
+
+    @if ($weather)
+        &lt;h2 class=&quot;text-xl font-semibold&quot;&gt;{{ $city }}&lt;/h2&gt;
+        &lt;p class=&quot;text-gray-700 text-lg&quot;&gt;🌡️ {{ $weather[&#39;main&#39;][&#39;temp&#39;] }}&deg;C&lt;/p&gt;
+        &lt;p class=&quot;text-gray-500 capitalize&quot;&gt;☁️ {{ $weather[&#39;weather&#39;][0][&#39;description&#39;] }}&lt;/p&gt;
+        &lt;p class=&quot;text-gray-500&quot;&gt;💧 Umidade: {{ $weather[&#39;main&#39;][&#39;humidity&#39;] }}%&lt;/p&gt;
+    @else
+        &lt;p class=&quot;text-red-500&quot;&gt;N&atilde;o foi poss&iacute;vel obter a previs&atilde;o para &quot;{{ $city }}&quot;&lt;/p&gt;
+    @endif
+&lt;/div&gt;
+@endsection
+</code></pre>
+
+<hr />
+<h3>4. 💡 Exemplo de layout base (caso n&atilde;o tenha um)</h3>
+
+<p>Crie <code inline="">resources/views/layouts/app.blade.php</code> se ainda n&atilde;o existir:</p>
+
+<pre>
+<code>&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;pt-BR&quot;&gt;
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;title&gt;Previs&atilde;o do Tempo&lt;/title&gt;
+    &lt;link href=&quot;https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;/head&gt;
+&lt;body class=&quot;bg-gray-100&quot;&gt;
+    @yield(&#39;content&#39;)
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<hr />
+<h2>🔁 Livewire (opcional)</h2>
+
+<p>Perfeito! Vamos transformar a busca em <strong>reativa com Livewire</strong>, al&eacute;m de adicionar <strong>&iacute;cones meteorol&oacute;gicos</strong>, <strong>previs&atilde;o por hora</strong>, e um <strong>mapa com a localiza&ccedil;&atilde;o</strong>. Aqui est&aacute; o passo a passo:</p>
+
+<hr />
+<h2>✅ Etapas completas com Livewire + &iacute;cones + previs&atilde;o por hora + mapa</h2>
+
+<hr />
+<h3>1. 📦 Instale o Livewire (caso ainda n&atilde;o tenha)</h3>
+
+<pre>
+<code>composer require livewire/livewire
+php artisan livewire:publish
+</code></pre>
+
+<hr />
+<h3>2. 🧠 Crie o componente Livewire</h3>
+
+<pre>
+<code>php artisan make:livewire WeatherForecast
+</code></pre>
+
+<hr />
+<h3>3. ✍️ C&oacute;digo do componente <code inline="">app/Livewire/WeatherForecast.php</code></h3>
+
+<pre>
+<code>namespace App\Livewire;
+
+use Livewire\Component;
+use Illuminate\Support\Facades\Http;
+
+class WeatherForecast extends Component
+{
+    public $city = &#39;Buenos Aires&#39;;
+    public $weather;
+    public $hourly;
+
+    public function mount()
+    {
+        $this-&gt;fetchWeather();
+    }
+
+    public function updatedCity()
+    {
+        $this-&gt;fetchWeather();
+    }
+
+    public function fetchWeather()
+    {
+        $apiKey = env(&#39;OPENWEATHER_API_KEY&#39;);
+
+        // Get coordinates first
+        $geo = Http::get(&#39;http://api.openweathermap.org/geo/1.0/direct&#39;, [
+            &#39;q&#39; =&gt; $this-&gt;city,
+            &#39;limit&#39; =&gt; 1,
+            &#39;appid&#39; =&gt; $apiKey,
+        ])-&gt;json();
+
+        if (empty($geo)) {
+            $this-&gt;weather = null;
+            $this-&gt;hourly = [];
+            return;
+        }
+
+        $lat = $geo[0][&#39;lat&#39;];
+        $lon = $geo[0][&#39;lon&#39;];
+
+        $response = Http::get(&quot;https://api.openweathermap.org/data/2.5/onecall&quot;, [
+            &#39;lat&#39; =&gt; $lat,
+            &#39;lon&#39; =&gt; $lon,
+            &#39;exclude&#39; =&gt; &#39;minutely,daily,alerts&#39;,
+            &#39;units&#39; =&gt; &#39;metric&#39;,
+            &#39;appid&#39; =&gt; $apiKey,
+            &#39;lang&#39; =&gt; &#39;pt_br&#39;,
+        ]);
+
+        if ($response-&gt;successful()) {
+            $data = $response-&gt;json();
+            $this-&gt;weather = $data[&#39;current&#39;];
+            $this-&gt;hourly = array_slice($data[&#39;hourly&#39;], 0, 6); // pr&oacute;ximas 6 horas
+        } else {
+            $this-&gt;weather = null;
+            $this-&gt;hourly = [];
+        }
+    }
+
+    public function render()
+    {
+        return view(&#39;livewire.weather-forecast&#39;);
+    }
+}
+</code></pre>
+
+<hr />
+<h3>4. 🖼️ View do componente: <code inline="">resources/views/livewire/weather-forecast.blade.php</code></h3>
+
+<pre>
+<code>&lt;div class=&quot;max-w-xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-md text-center&quot;&gt;
+    &lt;h1 class=&quot;text-2xl font-bold mb-4&quot;&gt;Previs&atilde;o do Tempo&lt;/h1&gt;
+
+    &lt;input type=&quot;text&quot; wire:model.debounce.1000ms=&quot;city&quot;
+           placeholder=&quot;Digite a cidade&quot;
+           class=&quot;border px-4 py-2 rounded w-full mb-4&quot; /&gt;
+
+    @if ($weather)
+        &lt;h2 class=&quot;text-xl font-semibold&quot;&gt;{{ $city }}&lt;/h2&gt;
+        &lt;div class=&quot;flex flex-col items-center&quot;&gt;
+            &lt;img src=&quot;https://openweathermap.org/img/wn/{{ $weather[&#39;weather&#39;][0][&#39;icon&#39;] }}@2x.png&quot; alt=&quot;icone clima&quot;&gt;
+            &lt;p class=&quot;text-lg font-bold&quot;&gt;🌡️ {{ round($weather[&#39;temp&#39;]) }}&deg;C&lt;/p&gt;
+            &lt;p class=&quot;capitalize text-gray-600&quot;&gt;☁️ {{ $weather[&#39;weather&#39;][0][&#39;description&#39;] }}&lt;/p&gt;
+            &lt;p class=&quot;text-sm text-gray-500&quot;&gt;💧 Umidade: {{ $weather[&#39;humidity&#39;] }}%&lt;/p&gt;
+        &lt;/div&gt;
+
+        &lt;h3 class=&quot;mt-6 text-lg font-bold&quot;&gt;Pr&oacute;ximas horas&lt;/h3&gt;
+        &lt;div class=&quot;grid grid-cols-3 gap-4 mt-3 text-sm&quot;&gt;
+            @foreach ($hourly as $hour)
+                &lt;div class=&quot;bg-gray-100 rounded p-2&quot;&gt;
+                    &lt;p&gt;{{ \Carbon\Carbon::createFromTimestamp($hour[&#39;dt&#39;])-&gt;format(&#39;H:i&#39;) }}&lt;/p&gt;
+                    &lt;img src=&quot;https://openweathermap.org/img/wn/{{ $hour[&#39;weather&#39;][0][&#39;icon&#39;] }}.png&quot; class=&quot;mx-auto&quot;&gt;
+                    &lt;p&gt;{{ round($hour[&#39;temp&#39;]) }}&deg;C&lt;/p&gt;
+                &lt;/div&gt;
+            @endforeach
+        &lt;/div&gt;
+
+        &lt;h3 class=&quot;mt-6 text-lg font-bold&quot;&gt;📍 Mapa&lt;/h3&gt;
+        &lt;iframe
+            width=&quot;100%&quot;
+            height=&quot;250&quot;
+            class=&quot;rounded mt-2&quot;
+            frameborder=&quot;0&quot;
+            scrolling=&quot;no&quot;
+            marginheight=&quot;0&quot;
+            marginwidth=&quot;0&quot;
+            src=&quot;https://maps.google.com/maps?q={{ urlencode($city) }}&amp;t=&amp;z=10&amp;ie=UTF8&amp;iwloc=&amp;output=embed&quot;&gt;
+        &lt;/iframe&gt;
+    @else
+        &lt;p class=&quot;text-red-500&quot;&gt;N&atilde;o foi poss&iacute;vel obter a previs&atilde;o para &quot;{{ $city }}&quot;&lt;/p&gt;
+    @endif
+&lt;/div&gt;
+</code></pre>
+
+<hr />
+<h3>5. 🛣️ Use o componente em uma p&aacute;gina Blade</h3>
+
+<p>Crie <code inline="">resources/views/weather.blade.php</code>:</p>
+
+<pre>
+<code>@extends(&#39;layouts.app&#39;)
+
+@section(&#39;content&#39;)
+    @livewire(&#39;weather-forecast&#39;)
+@endsection
+</code></pre>
+
+<hr />
+<h3>6. 📄 Adicione a rota</h3>
+
+<p>Em <code inline="">routes/web.php</code>:</p>
+
+<pre>
+<code>Route::get(&#39;/clima&#39;, function () {
+    return view(&#39;weather&#39;);
+});
+</code></pre>
+
+<hr />
+<h3>7. 🧩 Inclua Livewire no layout base (<code inline="">layouts/app.blade.php</code>)</h3>
+
+<p>No <code inline="">&lt;head&gt;</code>:</p>
+
+<pre>
+<code>@livewireStyles
+</code></pre>
+
+<p>Antes de fechar <code inline="">&lt;/body&gt;</code>:</p>
+
+<pre>
+<code>@livewireScripts
+</code></pre>
+
+<hr />
+<h2>✅ Pronto! Agora:</h2>
+
+<ul>
+	<li>
+	<p>A previs&atilde;o do tempo &eacute; atualizada <strong>reativamente</strong> ao digitar a cidade.</p>
+	</li>
+	<li>
+	<p>Mostra <strong>&iacute;cone do clima atual</strong>, <strong>previs&atilde;o para 6 horas</strong> e <strong>mapa da cidade</strong>.</p>
+	</li>
+	<li>
+	<p>Pode ser expandido para incluir <strong>previs&atilde;o di&aacute;ria, radar, alertas</strong>, etc.</p>
+	</li>
+</ul>
+
+<hr />
+<p>&Oacute;timo! Vamos criar uma <strong>vers&atilde;o mais avan&ccedil;ada e estilizada</strong> do componente com:</p>
+
+<hr />
+<h3>✅ Recursos adicionais:</h3>
+
+<ul>
+	<li>
+	<p><strong>Previs&atilde;o para os pr&oacute;ximos 5 dias</strong></p>
+	</li>
+	<li>
+	<p><strong>Livewire reativo (sem recarregar a p&aacute;gina)</strong></p>
+	</li>
+	<li>
+	<p><strong>&Iacute;cones de clima</strong></p>
+	</li>
+	<li>
+	<p><strong>Gr&aacute;fico simples (temperatura m&aacute;xima/m&iacute;nima por dia)</strong></p>
+	</li>
+	<li>
+	<p><strong>Estilo com Tailwind CSS</strong></p>
+	</li>
+	<li>
+	<p><strong>Mapa da cidade</strong></p>
+	</li>
+</ul>
+
+<hr />
+<h2>🧠 Atualiza&ccedil;&atilde;o do componente Livewire</h2>
+
+<h3><code inline="">app/Livewire/WeatherForecast.php</code></h3>
+
+<p>Atualize o componente para buscar tamb&eacute;m a <strong>previs&atilde;o di&aacute;ria</strong>:</p>
+
+<pre>
+<code>namespace App\Livewire;
+
+use Livewire\Component;
+use Illuminate\Support\Facades\Http;
+
+class WeatherForecast extends Component
+{
+    public $city = &#39;S&atilde;o Paulo&#39;;
+    public $weather;
+    public $daily = [];
+
+    public function mount()
+    {
+        $this-&gt;fetchWeather();
+    }
+
+    public function updatedCity()
+    {
+        $this-&gt;fetchWeather();
+    }
+
+    public function fetchWeather()
+    {
+        $apiKey = env(&#39;OPENWEATHER_API_KEY&#39;);
+
+        $geo = Http::get(&#39;http://api.openweathermap.org/geo/1.0/direct&#39;, [
+            &#39;q&#39; =&gt; $this-&gt;city,
+            &#39;limit&#39; =&gt; 1,
+            &#39;appid&#39; =&gt; $apiKey,
+        ])-&gt;json();
+
+        if (empty($geo)) {
+            $this-&gt;weather = null;
+            $this-&gt;daily = [];
+            return;
+        }
+
+        $lat = $geo[0][&#39;lat&#39;];
+        $lon = $geo[0][&#39;lon&#39;];
+
+        $response = Http::get(&quot;https://api.openweathermap.org/data/2.5/onecall&quot;, [
+            &#39;lat&#39; =&gt; $lat,
+            &#39;lon&#39; =&gt; $lon,
+            &#39;exclude&#39; =&gt; &#39;minutely,hourly,alerts&#39;,
+            &#39;units&#39; =&gt; &#39;metric&#39;,
+            &#39;appid&#39; =&gt; $apiKey,
+            &#39;lang&#39; =&gt; &#39;pt_br&#39;,
+        ]);
+
+        if ($response-&gt;successful()) {
+            $data = $response-&gt;json();
+            $this-&gt;weather = $data[&#39;current&#39;];
+            $this-&gt;daily = array_slice($data[&#39;daily&#39;], 0, 5);
+        } else {
+            $this-&gt;weather = null;
+            $this-&gt;daily = [];
+        }
+    }
+
+    public function render()
+    {
+        return view(&#39;livewire.weather-forecast&#39;);
+    }
+}
+</code></pre>
+
+<hr />
+<h2>🖼️ View com Estilo + Gr&aacute;fico</h2>
+
+<h3><code inline="">resources/views/livewire/weather-forecast.blade.php</code></h3>
+
+<pre>
+<code>&lt;div class=&quot;max-w-3xl mx-auto mt-10 p-6 bg-white shadow-lg rounded-xl&quot;&gt;
+    &lt;h1 class=&quot;text-3xl font-bold text-center mb-6&quot;&gt;🌤️ Previs&atilde;o do Tempo&lt;/h1&gt;
+
+    &lt;input type=&quot;text&quot; wire:model.debounce.1000ms=&quot;city&quot;
+           placeholder=&quot;Digite a cidade&quot;
+           class=&quot;border border-gray-300 px-4 py-2 rounded w-full mb-4 shadow-sm focus:ring focus:ring-blue-200&quot; /&gt;
+
+    @if ($weather)
+        &lt;div class=&quot;text-center&quot;&gt;
+            &lt;h2 class=&quot;text-2xl font-semibold&quot;&gt;{{ $city }}&lt;/h2&gt;
+            &lt;img src=&quot;https://openweathermap.org/img/wn/{{ $weather[&#39;weather&#39;][0][&#39;icon&#39;] }}@2x.png&quot; class=&quot;mx-auto&quot;&gt;
+            &lt;p class=&quot;text-lg font-bold&quot;&gt;🌡️ {{ round($weather[&#39;temp&#39;]) }}&deg;C&lt;/p&gt;
+            &lt;p class=&quot;capitalize text-gray-600&quot;&gt;☁️ {{ $weather[&#39;weather&#39;][0][&#39;description&#39;] }}&lt;/p&gt;
+            &lt;p class=&quot;text-sm text-gray-500&quot;&gt;💧 Umidade: {{ $weather[&#39;humidity&#39;] }}%&lt;/p&gt;
+        &lt;/div&gt;
+
+        &lt;div class=&quot;mt-6&quot;&gt;
+            &lt;h3 class=&quot;text-xl font-bold mb-2&quot;&gt;🗓️ Previs&atilde;o para os pr&oacute;ximos 5 dias&lt;/h3&gt;
+            &lt;div class=&quot;grid grid-cols-1 md:grid-cols-5 gap-4 text-center&quot;&gt;
+                @foreach ($daily as $day)
+                    &lt;div class=&quot;bg-blue-50 rounded-lg p-3 shadow-sm&quot;&gt;
+                        &lt;p class=&quot;font-medium&quot;&gt;{{ \Carbon\Carbon::createFromTimestamp($day[&#39;dt&#39;])-&gt;translatedFormat(&#39;D d/M&#39;) }}&lt;/p&gt;
+                        &lt;img src=&quot;https://openweathermap.org/img/wn/{{ $day[&#39;weather&#39;][0][&#39;icon&#39;] }}.png&quot; class=&quot;mx-auto&quot;&gt;
+                        &lt;p class=&quot;text-sm capitalize&quot;&gt;{{ $day[&#39;weather&#39;][0][&#39;description&#39;] }}&lt;/p&gt;
+                        &lt;p class=&quot;text-sm&quot;&gt;🌡️ M&aacute;x: {{ round($day[&#39;temp&#39;][&#39;max&#39;]) }}&deg;C&lt;/p&gt;
+                        &lt;p class=&quot;text-sm&quot;&gt;🌡️ M&iacute;n: {{ round($day[&#39;temp&#39;][&#39;min&#39;]) }}&deg;C&lt;/p&gt;
+                    &lt;/div&gt;
+                @endforeach
+            &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;div class=&quot;mt-8&quot;&gt;
+            &lt;h3 class=&quot;text-xl font-bold mb-2&quot;&gt;📍 Localiza&ccedil;&atilde;o&lt;/h3&gt;
+            &lt;iframe
+                width=&quot;100%&quot;
+                height=&quot;250&quot;
+                class=&quot;rounded-lg shadow&quot;
+                frameborder=&quot;0&quot;
+                scrolling=&quot;no&quot;
+                marginheight=&quot;0&quot;
+                marginwidth=&quot;0&quot;
+                src=&quot;https://maps.google.com/maps?q={{ urlencode($city) }}&amp;t=&amp;z=10&amp;ie=UTF8&amp;iwloc=&amp;output=embed&quot;&gt;
+            &lt;/iframe&gt;
+        &lt;/div&gt;
+    @elseif(strlen($city) &gt; 2)
+        &lt;p class=&quot;text-red-500 text-center&quot;&gt;❌ N&atilde;o foi poss&iacute;vel encontrar &quot;{{ $city }}&quot;&lt;/p&gt;
+    @endif
+&lt;/div&gt;
+</code></pre>
+
+<hr />
+<h2>🎯 Resultado:</h2>
+
+<ul>
+	<li>
+	<p>⚡ Reativo: digite o nome da cidade &rarr; tudo se atualiza automaticamente</p>
+	</li>
+	<li>
+	<p>📅 Previs&atilde;o di&aacute;ria (5 dias)</p>
+	</li>
+	<li>
+	<p>🌐 Mapa do Google Maps</p>
+	</li>
+	<li>
+	<p>☁️ &Iacute;cones clim&aacute;ticos + descri&ccedil;&otilde;es</p>
+	</li>
+	<li>
+	<p>🎨 Layout bonito com Tailwind</p>
+	</li>
+</ul>
+
+<hr />
+<p>Perfeito! Vamos adicionar agora <strong>um gr&aacute;fico interativo de temperatura (m&aacute;x e m&iacute;n)</strong> para os pr&oacute;ximos 5 dias usando <strong>Chart.js</strong>, integrado com Livewire.</p>
+
+<hr />
+<h2>🎯 Objetivo</h2>
+
+<ul>
+	<li>
+	<p>Mostrar a <strong>temperatura m&aacute;xima e m&iacute;nima por dia</strong> em um <strong>gr&aacute;fico de linha</strong> usando <strong>Chart.js</strong></p>
+	</li>
+	<li>
+	<p>O gr&aacute;fico ser&aacute; atualizado automaticamente ao trocar a cidade</p>
+	</li>
+</ul>
+
+<hr />
+<h2>🧩 Passos</h2>
+
+<h3>1. 📦 Adicione Chart.js</h3>
+
+<p>No seu Blade principal (ex: <code inline="">resources/views/layouts/app.blade.php</code> ou diretamente no componente), inclua:</p>
+
+<pre>
+<code>&lt;script src=&quot;https://cdn.jsdelivr.net/npm/chart.js&quot;&gt;&lt;/script&gt;
+</code></pre>
+
+<hr />
+<h3>2. 🧠 Atualize o componente Blade</h3>
+
+<h3><code inline="">resources/views/livewire/weather-forecast.blade.php</code> (adicione isso <strong>ap&oacute;s a previs&atilde;o de 5 dias</strong>)</h3>
+
+<pre>
+<code>&lt;div class=&quot;mt-10&quot;&gt;
+    &lt;h3 class=&quot;text-xl font-bold mb-2&quot;&gt;📊 Gr&aacute;fico de Temperaturas&lt;/h3&gt;
+    &lt;canvas id=&quot;tempChart&quot; height=&quot;150&quot;&gt;&lt;/canvas&gt;
+&lt;/div&gt;
+
+@push(&#39;scripts&#39;)
+&lt;script&gt;
+    document.addEventListener(&#39;livewire:load&#39;, () =&gt; {
+        let chart;
+
+        Livewire.hook(&#39;message.processed&#39;, (message, component) =&gt; {
+            const daily = @json($daily);
+
+            const labels = daily.map(d =&gt; {
+                const date = new Date(d.dt * 1000);
+                return date.toLocaleDateString(&#39;pt-BR&#39;, { weekday: &#39;short&#39;, day: &#39;numeric&#39; });
+            });
+
+            const maxTemps = daily.map(d =&gt; d.temp.max);
+            const minTemps = daily.map(d =&gt; d.temp.min);
+
+            const data = {
+                labels: labels,
+                datasets: [
+                    {
+                        label: &#39;M&aacute;xima &deg;C&#39;,
+                        data: maxTemps,
+                        borderColor: &#39;rgb(255, 99, 132)&#39;,
+                        fill: false,
+                        tension: 0.2
+                    },
+                    {
+                        label: &#39;M&iacute;nima &deg;C&#39;,
+                        data: minTemps,
+                        borderColor: &#39;rgb(54, 162, 235)&#39;,
+                        fill: false,
+                        tension: 0.2
+                    }
+                ]
+            };
+
+            const config = {
+                type: &#39;line&#39;,
+                data: data,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: &#39;top&#39;
+                        },
+                        title: {
+                            display: false
+                        }
+                    }
+                },
+            };
+
+            // destr&oacute;i gr&aacute;fico antigo se houver
+            if (chart) chart.destroy();
+
+            const ctx = document.getElementById(&#39;tempChart&#39;).getContext(&#39;2d&#39;);
+            chart = new Chart(ctx, config);
+        });
+    });
+&lt;/script&gt;
+@endpush
+</code></pre>
+
+<blockquote>
+<p>⚠️ Certifique-se de que sua Blade principal ou layout use <code inline="">@stack(&#39;scripts&#39;)</code> no final para injetar esse <code inline="">&lt;script&gt;</code>.</p>
+</blockquote>
+
+<hr />
+<h3>Resultado 🎉</h3>
+
+<p>Voc&ecirc; ver&aacute;:</p>
+
+<ul>
+	<li>
+	<p>✅ Previs&atilde;o detalhada em cards</p>
+	</li>
+	<li>
+	<p>✅ Google Maps embutido</p>
+	</li>
+	<li>
+	<p>✅ Gr&aacute;fico de temperatura com <strong>linhas suaves e cores distintas</strong></p>
+	</li>
+	<li>
+	<p>✅ Atualiza&ccedil;&atilde;o autom&aacute;tica via Livewire</p>
+	</li>
+</ul>
+
+<hr />
+<h2>Fim e boa sorte!</h2>
+</div>
