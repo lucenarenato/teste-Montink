@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\Stock;
 use Illuminate\Http\Request;
@@ -10,7 +11,9 @@ class ProductController extends Controller
 {
     public function index() {
         $products = Product::with('stocks')->get();
-        return view('products.index', compact('products'));
+        $orders = Order::with('address')->get();
+        $cart = session('cart', []);
+        return view('products.index', compact('products', 'orders', 'cart'));
     }
 
     public function store(Request $request) {
@@ -34,7 +37,7 @@ class ProductController extends Controller
 
         }
 
-        return redirect()->route('home')->with('success', 'Produto criado com sucesso!');
+        return redirect()->route('products.index')->with('success', 'Produto criado com sucesso!');
     }
 
     public function update(Request $request, Product $product)
